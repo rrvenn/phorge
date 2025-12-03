@@ -79,7 +79,7 @@ jobs:
 
           # Tag the built image as latest and push both tags
           docker tag "${IMAGE_NAME}:${TAG}" "${IMAGE_NAME}:latest"
-          docker push "${IMAGE_NAME}:${TAG}" --all-tags
+          docker push --all-tags
 
       # --------------------------
       # 7. Save new commit hash
