@@ -74,9 +74,12 @@ jobs:
           TAG="${LATEST_HASH}"
 
           echo "Building Docker image with tag: $TAG"
+          # Build the image from the repository's Dockerfile
+          docker build -t "${IMAGE_NAME}:${TAG}" .
 
-          docker tag $IMAGE_NAME:$TAG $IMAGE_NAME:latest
-          docker push $IMAGE_NAME:latest --all-tags
+          # Tag the built image as latest and push both tags
+          docker tag "${IMAGE_NAME}:${TAG}" "${IMAGE_NAME}:latest"
+          docker push "${IMAGE_NAME}:${TAG}" --all-tags
 
       # --------------------------
       # 7. Save new commit hash
