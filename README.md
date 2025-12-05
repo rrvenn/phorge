@@ -1,56 +1,88 @@
-# Phorge-Docker
+# Phorge Docker image (unofficial)
 
-This is an unofficial Docker image of Phorge app.  
-Application configured as a single image with `supervisord` to control all necessary processes inside one docker container.  
+This repository provides an unofficial Docker image for Phorge. The image runs multiple services inside a single container (PHP-FPM, Nginx, SSH hooks, etc.) using `supervisord` to manage processes.
 
-## Configuration
+Important: This is an unofficial image and is not affiliated with the upstream Phorge project.
 
-To startup Phorge with a single command you need configured MySQL/MariaDB and S3 storage (Local server or AWS)
+**Automatic builds**
+- The repository contains a GitHub Actions workflow at `.github/workflows/dockerimage.yml` that builds the Docker image nightly (schedule) and on demand (`workflow_dispatch`).
+- Built images are pushed to Docker Hub under `rrvenn/phorge`.
+- Tags published by CI: a short commit SHA tag (7 characters) and `latest` (so `rrvenn/phorge:latest` will point to the newest image).
 
-### Variables
-|Name|Default Value|
-|---|---|
-|PROTOCOL|http|
-|SSH_PORT|8022|
-|GIT_USER|git|
-|MYSQL_HOST||
-|MYSQL_PORT|3306|
-|MYSQL_USER||
-|MYSQL_PASSWORD||
-|BASE_URI||
-|MINIO_SERVER||
-|MINIO_PORT||
-|MINIO_SERVER_SECRET_KEY||
-|MINIO_SERVER_ACCESS_KEY||
-|SMTP_SERVER||
-|SMTP_PORT||
-|SMTP_USER||
-|SMTP_PASSWORD||
-|SMTP_PROTOCOL||
+Getting started
+----------------
+You can run the image directly with `docker run` or orchestrate the stack with `docker-compose` (a `docker-compose.yml` is included in the repo).
 
-#### Example command to start:
-```
-docker run \
-    --rm \
-    -p 80:80 \
-    -p 8022:8022 \
-    --env MYSQL_HOST=mysqlhost.com \
-    --env MYSQL_PORT=3306 \
-    --env MYSQL_USER=root \
-    --env MYSQL_PASSWORD=changeme \
-    --env MINIO_SERVER_ACCESS_KEY=access_key \
-    --env MINIO_SERVER_SECRET_KEY=secret_key \
-    --env BASE_URI=yourdomain.com \
-    -v /your/repo/folder:/var/repo
-    rrvenn/phorge:latest
-```
+Docker Compose
+--------------
+The included `docker-compose.yml` defines these services:
+- `ph-web` — the Phorge web container (image `rrvenn/phorge`).
+- `ph-database` — MariaDB (`mariadb:10.5.1`).
+- `ph-storage` — MinIO object storage (`minio/minio`) configured as an S3-compatible storage server.
 
-### To launch all components of Phorge using `docker-compose` use following set of commands:
+The compose file references an `.env` file via `env_file: .env`. Update the `.env` file and then start the stack:
 
-Update the `.env` file, then start the application with the command below 
-```
+```bash
 docker-compose up -d
 ```
 
-## Links
-[Docker hub](https://hub.docker.com/r/rrvenn/phorge)
+.env template
+-------------
+Create a file named `.env` next to `docker-compose.yml`. The image reads environment variables at container start and the startup script applies them to Phorge's configuration. Below is a recommended template with defaults (where provided):
+
+```env
+# Phorge runtime
+PROTOCOL=http            # http or https (default: http)
+BASE_URI=example.com     # required: the public base URI (no trailing slash)
+
+# SSH / git user
+GIT_USER=root            # default in the Dockerfile is 'root'
+SSH_PORT=8022            # default SSH port inside the container
+
+# Database (MariaDB/MySQL)
+MYSQL_HOST=mysql         # host or service name (no default)
+MYSQL_PORT=3306          # default 3306
+MYSQL_USER=root          # database user
+MYSQL_PASSWORD=changeme  # database password
+
+# MinIO / S3 (optional)
+MINIO_SERVER=minio       # hostname or bucket name used by the startup script
+MINIO_PORT=9000          # port for MinIO (compose maps 9000)
+MINIO_SERVER_ACCESS_KEY=access_key
+MINIO_SERVER_SECRET_KEY=secret_key
+
+# SMTP (optional — all required for SMTP to be configured)
+SMTP_SERVER=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=smtp-user
+SMTP_PASSWORD=smtp-password
+SMTP_PROTOCOL=tls       # smtp protocol (e.g. tls)
+
+# Volumes: the compose file creates named volumes; you may mount host paths instead
+```
+
+Notes on variables
+- `PROTOCOL`: when set to `https` the startup script writes a small preamble to force HTTPS in PHP runtime.
+- `GIT_USER`: the image creates this user (if missing) and configures Phorge to use it for SSH/Git access.
+- `MINIO_SERVER` and related keys are used to configure Phorge's S3 storage settings — if you don't provide them, built-in file storage will be used.
+
+Example: quick run with `docker run`
+----------------------------------
+You can also run the image directly (example):
+
+```bash
+docker run --rm -p 80:80 -p 8022:8022 \
+  -e MYSQL_HOST=mysqlhost.com -e MYSQL_USER=root -e MYSQL_PASSWORD=changeme \
+  -e BASE_URI=example.com -v /your/repo/folder:/var/repo \
+  rrvenn/phorge:latest
+```
+
+Docker image tags
+- `rrvenn/phorge:latest` — newest image built by CI.
+- `rrvenn/phorge:<short-sha>` — images built by CI are also published with a short SHA tag for reproducibility.
+
+Links
+- Docker Hub: https://hub.docker.com/r/rrvenn/phorge
+
+See also
+- `Dockerfile`, `scripts/startup.sh`, and `docker-compose.yml` for details on how the container is configured and what environment variables are supported.
