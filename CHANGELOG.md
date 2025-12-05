@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Addressed package and path differences required by Alpine (library names, header locations for PHP extensions) and ensured build dependencies are cleaned up to keep the image small.
 - Improved SSH host key generation to be idempotent and to fail early with clear errors when prerequisites are missing.
 
+## [0.2.1] - 2025-12-05
+### Changed
+- CI: GitHub Actions workflow now publishes Docker images both with the short SHA tag and the `latest` tag (so the newest image can be pulled with `:latest`).
+
 ## [0.1.3] - 2020-06-01
 ### Fix
 - SSH port availability fix
