@@ -1,6 +1,6 @@
 services:
   ph-web:
-    image: local-phorge
+    image: rrvenn/phorge
     restart: always
     ports:
       - "8022:8022"
