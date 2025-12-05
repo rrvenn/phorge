@@ -34,9 +34,13 @@ jobs:
       - name: Get latest hash from external repo
         id: get_latest_hash
         run: |
-          LATEST_HASH=$(git ls-remote https://github.com/phorgeit/phorge.git HEAD | awk '{print $1}')
-          echo "LATEST_HASH=$LATEST_HASH" >> $GITHUB_ENV
-          echo "Latest external hash: $LATEST_HASH"
+          # Get the full hash and derive a short (7-char) hash for tagging.
+          FULL_HASH=$(git ls-remote https://github.com/phorgeit/phorge.git HEAD | awk '{print $1}')
+          SHORT_HASH=$(echo "$FULL_HASH" | cut -c1-7)
+          # Export both: LATEST_FULL for comparisons/storage, LATEST_HASH for tagging.
+          echo "LATEST_FULL=$FULL_HASH" >> $GITHUB_ENV
+          echo "LATEST_HASH=$SHORT_HASH" >> $GITHUB_ENV
+          echo "Latest external hash: $FULL_HASH (short: $SHORT_HASH)"
 
       # --------------------------
       # 4. Compare hashes
@@ -44,7 +48,8 @@ jobs:
       - name: Compare hashes
         id: compare
         run: |
-          if [ "$PREV_HASH" = "$LATEST_HASH" ]; then
+          # Compare the previously saved full hash against the freshly fetched full hash
+          if [ "$PREV_HASH" = "$LATEST_FULL" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -87,10 +92,11 @@ jobs:
       - name: Save new hash
         if: steps.compare.outputs.changed == 'true'
         run: |
-          echo "$LATEST_HASH" > .external_repo_hash
+          # Save the full hash so future comparisons are exact
+          echo "$LATEST_FULL" > .external_repo_hash
 
       - name: Commit updated hash file
         if: steps.compare.outputs.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update external repo hash to ${{ env.LATEST_HASH }}"
+          commit_message: "Update external repo hash to ${{ env.LATEST_FULL }}"

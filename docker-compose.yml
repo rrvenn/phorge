@@ -1,22 +1,13 @@
-version: '3.7'
-
 services:
   ph-web:
-    image: buddyspencer/phorge:latest
+    image: local-phorge
     restart: always
     ports:
       - "8022:8022"
       - "80:80"
     depends_on:
       - ph-database
-    environment: 
-      - MYSQL_HOST=ph-database
-      - MYSQL_PORT=3306
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MINIO_SERVER_ACCESS_KEY=minio
-      - MINIO_SERVER_SECRET_KEY=minio123
-      - BASE_URI=${BASE_URI}
+    env_file: .env
     volumes: 
       - ph-repo:/var/repo
   ph-database:
@@ -24,8 +15,7 @@ services:
     restart: always
     volumes:
       - database-volume:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    env_file: .env
   ph-storage:
     image: minio/minio
     restart: always
@@ -34,10 +24,7 @@ services:
       - 9000:9000
     volumes: 
       - storage-server:/data
-    environment:
-      - MINIO_ACCESS_KEY=minio
-      - MINIO_SECRET_KEY=minio123
-
+    env_file: .env
 volumes:
   database-volume:
   storage-server:

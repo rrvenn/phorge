@@ -1,9 +1,9 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.3-fpm-alpine
 
 LABEL maintainer="rrvenn@proton.me"
 
 ENV SSH_PORT=8022 \
-    GIT_USER=git \
+    GIT_USER=root \
     MYSQL_PORT=3306 \
     PROTOCOL=http
 
@@ -13,23 +13,47 @@ EXPOSE 8022 80 443
 # Uses the official PHP helper tools (`docker-php-ext-*`) and PECL for extensions like APCu.
 RUN apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
-        freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libzip-dev oniguruma-dev libxml2-dev curl-dev openssl-dev \
-    && apk add --no-cache \
-        freetype libjpeg-turbo libpng zlib libzip oniguruma git mercurial subversion sudo ca-certificates wget \
-        nginx supervisor openssh python3 py3-pygments procps \
-    && pecl channel-update pecl.php.net \
-    && pecl install apcu \
-    && docker-php-ext-enable apcu \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" gd pdo_mysql mysqli mbstring zip opcache \
-    && if [ -f /usr/libexec/git-core/git-http-backend ]; then ln -sf /usr/libexec/git-core/git-http-backend /usr/bin/git-http-backend; elif [ -f /usr/lib/git-core/git-http-backend ]; then ln -sf /usr/lib/git-core/git-http-backend /usr/bin/git-http-backend; fi \
+        freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libzip-dev oniguruma-dev libxml2-dev curl-dev openssl-dev
+
+RUN apk add --no-cache \
+        git \
+        nginx \
+        bash \
+        libpng \
+        libjpeg-turbo \
+        freetype \
+        icu-dev \
+        mariadb-client \
+        openssh \
+        tini \
+        oniguruma \
+        zlib \
+        libzip \
+        mercurial \
+        ca-certificates \
+        subversion \
+        sudo \
+        supervisor \
+        python3 \
+        py3-pygments \
+        wget \
+        procps \
+        imagemagick
+
+RUN pecl install apcu
+RUN docker-php-ext-enable apcu
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/freetype2 --with-jpeg=/usr/include \
+    && docker-php-ext-install -j"$(nproc)" opcache pcntl gd pdo_mysql mysqli mbstring zip \
+    && docker-php-ext-enable zip apcu
+
+RUN if [ -f /usr/libexec/git-core/git-http-backend ]; then ln -sf /usr/libexec/git-core/git-http-backend /usr/bin/git-http-backend; elif [ -f /usr/lib/git-core/git-http-backend ]; then ln -sf /usr/lib/git-core/git-http-backend /usr/bin/git-http-backend; fi \
     && apk del .build-deps \
     && rm -rf /var/cache/apk/*
 
 # Download phorge sources
 RUN mkdir -p /var/www/phorge/
-RUN git clone https://we.phorge.it/source/arcanist.git /var/www/phorge/arcanist \
-    && git clone https://we.phorge.it/source/phorge.git /var/www/phorge/phorge
+RUN git clone https://github.com/phorgeit/arcanist.git /var/www/phorge/arcanist \
+    && git clone https://github.com/phorgeit/phorge.git /var/www/phorge/phorge
 
 # copy nginx config (the repo provides a custom nginx.conf)
 COPY ./configs/nginx-ph.conf /etc/nginx/sites-available/phorge.conf
@@ -52,5 +76,7 @@ COPY ./scripts/startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
 RUN mkdir -p /var/repo/
+
+USER root
 
 CMD [ "/startup.sh" ]

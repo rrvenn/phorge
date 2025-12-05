@@ -3,14 +3,14 @@
 sleep 30
 
 if id "$GIT_USER" >/dev/null 2>&1; then
-        echo "user $GIT_USER already exists"
+  echo "user $GIT_USER already exists"
 else
-        useradd $GIT_USER
-        usermod -p NP $GIT_USER
-        echo "$GIT_USER ALL=(daemon) SETENV: NOPASSWD: /bin/ls, /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/ssh" >> /etc/sudoers
-        chown -R $GIT_USER /var/repo
-        /var/www/phorge/phorge/bin/config set phd.user $GIT_USER
-        /var/www/phorge/phorge/bin/config set diffusion.ssh-user $GIT_USER
+  addgroup -S "$GIT_USER"
+  adduser -S "$GIT_USER" -G "$GIT_USER"
+  echo "$GIT_USER ALL=(daemon) SETENV: NOPASSWD: /bin/ls, /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/ssh" >> /etc/sudoers
+  chown -R $GIT_USER /var/repo
+  /var/www/phorge/phorge/bin/config set phd.user $GIT_USER
+  /var/www/phorge/phorge/bin/config set diffusion.ssh-user $GIT_USER
 fi
 
 mkdir /run/sshd
@@ -24,8 +24,9 @@ chmod 755 /usr/libexec/phorge-ssh-hook.sh
 cp /var/www/phorge/phorge/resources/sshd/sshd_config.phorge.example /etc/ssh/sshd_config.phorge
 sed -i "s/vcs-user/$GIT_USER/g" /etc/ssh/sshd_config.phorge
 sed -i "s/2222/$SSH_PORT/g" /etc/ssh/sshd_config.phorge
+sed -i "s/PrintLastLog/#PrintLastLog/g" /etc/ssh/sshd_config.phorge
 
-sh /regenerate-ssh-keys.sh
+bash /regenerate-ssh-keys.sh
 
 #SSH Configuration
 /var/www/phorge/phorge/bin/config set diffusion.ssh-port $SSH_PORT
@@ -74,7 +75,7 @@ then
 fi
 
 # Update base uri
-/var/www/phorge/phorge/bin/config set phorge.base-uri "$PROTOCOL://$BASE_URI/"
+/var/www/phorge/phorge/bin/config set phabricator.base-uri "$PROTOCOL://$BASE_URI/"
 sed -i "s/  server_name phorge.local;/  server_name $BASE_URI;/g" /etc/nginx/sites-available/phorge.conf
 #sed "s/    return 301 \$scheme:\/\/phorge.local$request_uri;"
 #general parameters configuration

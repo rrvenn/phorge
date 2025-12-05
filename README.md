@@ -3,9 +3,6 @@
 This is an unofficial Docker image of Phorge app.  
 Application configured as a single image with `supervisord` to control all necessary processes inside one docker container.  
 
-## Docker image available for OS/ARCH
-* `linux/amd64, linux/arm64` | tag: `latest`
-
 ## Configuration
 
 To startup Phorge with a single command you need configured MySQL/MariaDB and S3 storage (Local server or AWS)
@@ -45,16 +42,15 @@ docker run \
     --env MINIO_SERVER_SECRET_KEY=secret_key \
     --env BASE_URI=yourdomain.com \
     -v /your/repo/folder:/var/repo
-    buddyspencer/phorge:latest
+    rrvenn/phorge:latest
 ```
 
 ### To launch all components of Phorge using `docker-compose` use following set of commands:
-#### `amd64` arch:
+
+Update the `.env` file, then start the application with the command below 
 ```
-export BASE_URI=yourdomain.com
-export MYSQL_ROOT_PASSWORD=changeme
 docker-compose up -d
 ```
 
 ## Links
-[Docker hub](https://hub.docker.com/r/buddyspencer/phorge)
+[Docker hub](https://hub.docker.com/r/rrvenn/phorge)
