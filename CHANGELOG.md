@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - Added the ability to set the timezone in Phorge with an environment variable
 - Made it so that Phorge PDH actually can be started with supervisord
 
+### Added
+- Added the PHORGE_GIT_USER to the .env file
+
 ## [0.3.0] - 2025-12-05
 ### Changed
 - Renamed the environment variables for better clarity
