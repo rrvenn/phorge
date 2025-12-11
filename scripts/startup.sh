@@ -27,7 +27,8 @@ sed -i "s/2222/$SSH_PORT/g" /etc/ssh/sshd_config.phorge
 sed -i "s/PrintLastLog/#PrintLastLog/g" /etc/ssh/sshd_config.phorge
 
 bash /regenerate-ssh-keys.sh
-
+#Timezone configuration
+/var/www/phorge/phorge/bin/config set phabricator.timezone $PHORGE_TIMEZONE
 #SSH Configuration
 /var/www/phorge/phorge/bin/config set diffusion.ssh-port $SSH_PORT
 /var/www/phorge/phorge/bin/config set files.enable-imagemagick true
