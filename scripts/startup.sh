@@ -5,8 +5,8 @@ sleep 30
 if id "$PHORGE_GIT_USER" >/dev/null 2>&1; then
   echo "user $PHORGE_GIT_USER already exists"
 else
-  addgroup -S "$PHORGE_GIT_USER"
-  adduser -S "$PHORGE_GIT_USER" -G "$PHORGE_GIT_USER"
+  addgroup "$PHORGE_GIT_USER"
+  adduser "$PHORGE_GIT_USER" -G "$PHORGE_GIT_USER" -D -h /var/repo
   echo "$PHORGE_GIT_USER ALL=(daemon) SETENV: NOPASSWD: /bin/ls, /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/ssh" >> /etc/sudoers
   chown -R $PHORGE_GIT_USER /var/repo
   /var/www/phorge/phorge/bin/config set phd.user $PHORGE_GIT_USER

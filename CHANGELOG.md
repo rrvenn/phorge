@@ -1,11 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [0.3.1] - 2025-12-05
+## [0.3.1] - 2025-12-11
 ### Changed
 - Updated MariaDB to version 10.11
 - Added the ability to set the timezone in Phorge with an environment variable
-
+- Made it so that Phorge PDH actually can be started with supervisord
 
 ## [0.3.0] - 2025-12-05
 ### Changed

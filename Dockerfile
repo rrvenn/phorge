@@ -39,13 +39,13 @@ RUN apk add --no-cache \
         wget \
         procps \
         imagemagick \
-        libldap
+        libldap 
 
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/freetype2 --with-jpeg=/usr/include \
     && docker-php-ext-install -j"$(nproc)" opcache pcntl gd pdo_mysql mysqli mbstring zip ldap \
-    && docker-php-ext-enable zip apcu ldap
+    && docker-php-ext-enable zip apcu ldap pcntl
 
 RUN if [ -f /usr/libexec/git-core/git-http-backend ]; then ln -sf /usr/libexec/git-core/git-http-backend /usr/bin/git-http-backend; elif [ -f /usr/lib/git-core/git-http-backend ]; then ln -sf /usr/lib/git-core/git-http-backend /usr/bin/git-http-backend; fi \
     && apk del .build-deps \
@@ -74,6 +74,8 @@ RUN mkdir -p /run/php && chown www-data:www-data /run/php
 # copy supervisord config and startup script
 COPY ./configs/supervisord.conf /etc/supervisord.conf
 COPY ./scripts/startup.sh /startup.sh
+COPY ./scripts/phorge-pdh-wrapper.sh /phorge-pdh-wrapper.sh
+RUN chmod +x /phorge-pdh-wrapper.sh
 RUN chmod +x /startup.sh
 
 RUN mkdir -p /var/repo/
