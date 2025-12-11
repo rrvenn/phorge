@@ -11,7 +11,7 @@ services:
     volumes: 
       - ph-repo:/var/repo
   ph-database:
-    image: mariadb:10.5.1
+    image: mariadb:10.11
     restart: always
     volumes:
       - database-volume:/var/lib/mysql
