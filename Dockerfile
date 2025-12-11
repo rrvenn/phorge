@@ -13,7 +13,7 @@ EXPOSE 8022 80 443
 # Uses the official PHP helper tools (`docker-php-ext-*`) and PECL for extensions like APCu.
 RUN apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
-        freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libzip-dev oniguruma-dev libxml2-dev curl-dev openssl-dev
+        freetype-dev libjpeg-turbo-dev libpng-dev zlib-dev libzip-dev oniguruma-dev libxml2-dev curl-dev openssl-dev ldb-dev openldap-dev 
 
 RUN apk add --no-cache \
         git \
@@ -38,13 +38,14 @@ RUN apk add --no-cache \
         py3-pygments \
         wget \
         procps \
-        imagemagick
+        imagemagick \
+        libldap
 
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/freetype2 --with-jpeg=/usr/include \
-    && docker-php-ext-install -j"$(nproc)" opcache pcntl gd pdo_mysql mysqli mbstring zip \
-    && docker-php-ext-enable zip apcu
+    && docker-php-ext-install -j"$(nproc)" opcache pcntl gd pdo_mysql mysqli mbstring zip ldap \
+    && docker-php-ext-enable zip apcu ldap
 
 RUN if [ -f /usr/libexec/git-core/git-http-backend ]; then ln -sf /usr/libexec/git-core/git-http-backend /usr/bin/git-http-backend; elif [ -f /usr/lib/git-core/git-http-backend ]; then ln -sf /usr/lib/git-core/git-http-backend /usr/bin/git-http-backend; fi \
     && apk del .build-deps \
