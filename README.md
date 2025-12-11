@@ -17,7 +17,7 @@ Docker Compose
 --------------
 The included `docker-compose.yml` defines these services:
 - `ph-web` — the Phorge web container (image `rrvenn/phorge`).
-- `ph-database` — MariaDB (`mariadb:10.5.1`).
+- `ph-database` — MariaDB (`mariadb:10.11`).
 - `ph-storage` — MinIO object storage (`minio/minio`) configured as an S3-compatible storage server.
 
 The compose file references an `.env` file via `env_file: .env`. Update the `.env` file and then start the stack:
