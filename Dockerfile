@@ -41,7 +41,8 @@ RUN apk add --no-cache \
         wget \
         procps \
         imagemagick \
-        libldap 
+        libldap \
+        git-daemon
 
 RUN pecl install apcu
 RUN docker-php-ext-enable apcu

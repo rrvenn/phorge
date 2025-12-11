@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added the PHORGE_GIT_USER to the .env file
 - Added the env PHORGE_STORAGE_ENIGNE with local, this vill map large-files to a local folder 
+- Added missing binary git-http-backend that made diffusion not work
 
 ## [0.3.0] - 2025-12-05
 ### Changed
