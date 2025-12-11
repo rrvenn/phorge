@@ -3,7 +3,7 @@ FROM php:8.3-fpm-alpine
 LABEL maintainer="rrvenn@proton.me"
 
 ENV SSH_PORT=8022 \
-    GIT_USER=root \
+    PHORGE_GIT_USER=root \
     MYSQL_PORT=3306 \
     PROTOCOL=http
 

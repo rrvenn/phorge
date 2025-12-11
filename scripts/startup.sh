@@ -2,27 +2,27 @@
 
 sleep 30
 
-if id "$GIT_USER" >/dev/null 2>&1; then
-  echo "user $GIT_USER already exists"
+if id "$PHORGE_GIT_USER" >/dev/null 2>&1; then
+  echo "user $PHORGE_GIT_USER already exists"
 else
-  addgroup -S "$GIT_USER"
-  adduser -S "$GIT_USER" -G "$GIT_USER"
-  echo "$GIT_USER ALL=(daemon) SETENV: NOPASSWD: /bin/ls, /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/ssh" >> /etc/sudoers
-  chown -R $GIT_USER /var/repo
-  /var/www/phorge/phorge/bin/config set phd.user $GIT_USER
-  /var/www/phorge/phorge/bin/config set diffusion.ssh-user $GIT_USER
+  addgroup -S "$PHORGE_GIT_USER"
+  adduser -S "$PHORGE_GIT_USER" -G "$PHORGE_GIT_USER"
+  echo "$PHORGE_GIT_USER ALL=(daemon) SETENV: NOPASSWD: /bin/ls, /usr/bin/git, /usr/bin/git-upload-pack, /usr/bin/git-receive-pack, /usr/bin/ssh" >> /etc/sudoers
+  chown -R $PHORGE_GIT_USER /var/repo
+  /var/www/phorge/phorge/bin/config set phd.user $PHORGE_GIT_USER
+  /var/www/phorge/phorge/bin/config set diffusion.ssh-user $PHORGE_GIT_USER
 fi
 
 mkdir /run/sshd
 
 mkdir /usr/libexec
 cp /var/www/phorge/phorge/resources/sshd/phorge-ssh-hook.sh /usr/libexec/phorge-ssh-hook.sh
-sed -i "s/vcs-user/$GIT_USER/g" /usr/libexec/phorge-ssh-hook.sh
+sed -i "s/vcs-user/$PHORGE_GIT_USER/g" /usr/libexec/phorge-ssh-hook.sh
 sed -i "s/\/path\/to\/phorge/\/var\/www\/phorge\/phorge/g" /usr/libexec/phorge-ssh-hook.sh
 chmod 755 /usr/libexec/phorge-ssh-hook.sh
 
 cp /var/www/phorge/phorge/resources/sshd/sshd_config.phorge.example /etc/ssh/sshd_config.phorge
-sed -i "s/vcs-user/$GIT_USER/g" /etc/ssh/sshd_config.phorge
+sed -i "s/vcs-user/$PHORGE_GIT_USER/g" /etc/ssh/sshd_config.phorge
 sed -i "s/2222/$SSH_PORT/g" /etc/ssh/sshd_config.phorge
 sed -i "s/PrintLastLog/#PrintLastLog/g" /etc/ssh/sshd_config.phorge
 
@@ -32,10 +32,10 @@ bash /regenerate-ssh-keys.sh
 /var/www/phorge/phorge/bin/config set diffusion.ssh-port $SSH_PORT
 /var/www/phorge/phorge/bin/config set files.enable-imagemagick true
 #DB configuration
-/var/www/phorge/phorge/bin/config set mysql.host $MYSQL_HOST
-/var/www/phorge/phorge/bin/config set mysql.port $MYSQL_PORT
-/var/www/phorge/phorge/bin/config set mysql.user $MYSQL_USER
-/var/www/phorge/phorge/bin/config set mysql.pass $MYSQL_PASSWORD
+/var/www/phorge/phorge/bin/config set mysql.host $PHORGE_MYSQL_HOST
+/var/www/phorge/phorge/bin/config set mysql.port $PHORGE_MYSQL_PORT
+/var/www/phorge/phorge/bin/config set mysql.user $PHORGE_MYSQL_USER
+/var/www/phorge/phorge/bin/config set mysql.pass $PHORGE_MYSQL_PASS
 /var/www/phorge/phorge/bin/config set diffusion.allow-http-auth true
 
 if [ "$PROTOCOL" == "https" ]
@@ -75,8 +75,8 @@ then
 fi
 
 # Update base uri
-/var/www/phorge/phorge/bin/config set phabricator.base-uri "$PROTOCOL://$BASE_URI/"
-sed -i "s/  server_name phorge.local;/  server_name $BASE_URI;/g" /etc/nginx/sites-available/phorge.conf
+/var/www/phorge/phorge/bin/config set phabricator.base-uri "$PROTOCOL://$PHORGE_BASE_URI/"
+sed -i "s/  server_name phorge.local;/  server_name $PHORGE_BASE_URI;/g" /etc/nginx/sites-available/phorge.conf
 #sed "s/    return 301 \$scheme:\/\/phorge.local$request_uri;"
 #general parameters configuration
 /var/www/phorge/phorge/bin/config set pygments.enabled true
