@@ -7,6 +7,8 @@ ENV SSH_PORT=8022 \
     MYSQL_PORT=3306 \
     PROTOCOL=http
 
+VOLUME /storage
+
 EXPOSE 8022 80 443
 
 # Install runtime packages and build dependencies, then install PHP extensions.

@@ -10,6 +10,7 @@ services:
     env_file: .env
     volumes: 
       - ph-repo:/var/repo
+      - ph-files:/storage
   ph-database:
     image: mariadb:10.11
     restart: always
@@ -63,3 +64,4 @@ volumes:
   database-volume:
   storage-server:
   ph-repo:
+  ph-files:

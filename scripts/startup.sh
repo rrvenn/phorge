@@ -47,6 +47,13 @@ $_SERVER['"'"'HTTPS'"'"'] = true;' > /var/www/phorge/phorge/support/preamble.php
 fi
 
 #Large file storage configuration
+if [ "$PHORGE_STORAGE_ENGINE" == "local" ]
+then
+    mkdir -p /storage
+    chown www-data:www-data /storage
+    /var/www/phorge/phorge/bin/config set storage.local-disk.path /storage
+fi
+
 if [ ! -z "$MINIO_SERVER" ]
 then
     /var/www/phorge/phorge/bin/config set storage.s3.bucket $MINIO_SERVER
