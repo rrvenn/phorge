@@ -65,6 +65,9 @@ COPY ./configs/nginx.conf /etc/nginx/nginx.conf
 RUN mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled \
     && ln -sf /etc/nginx/sites-available/phorge.conf /etc/nginx/sites-enabled/phorge.conf
 
+# copy git config
+COPY ./configs/gitconfig /etc/gitconfig
+
 # copy ssh key generation
 COPY ./configs/regenerate-ssh-keys.sh /regenerate-ssh-keys.sh
 

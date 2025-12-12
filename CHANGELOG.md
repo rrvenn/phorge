@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2025-12-12
+### Added
+- Added the gitconfig file so the phorge version informaiton can be displayed on the http(s)://<phorgeURL>/config/ page 
+
 ## [0.3.1] - 2025-12-11
 ### Changed
 - Updated MariaDB to version 10.11

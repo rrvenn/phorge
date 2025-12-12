@@ -1,0 +1,3 @@
+[safe]
+        directory = /var/www/phorge/phorge
+        directory = /var/www/phorge/arcanist
