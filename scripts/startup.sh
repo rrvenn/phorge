@@ -54,13 +54,14 @@ then
     /var/www/phorge/phorge/bin/config set storage.local-disk.path /storage
 fi
 
-if [ ! -z "$MINIO_SERVER" ]
+# S3 / MinIO configuration — only when storage engine explicitly set to 's3'
+if [ "$PHORGE_STORAGE_ENGINE" == "s3" ] && [ ! -z "$PHORGE_STORAGE_S3_SERVER" ] && [ ! -z "$PHORGE_STORAGE_S3_SERVER_SECRET_KEY" ] && [ ! -z "$PHORGE_STORAGE_S3_SERVER_ACCESS_KEY" ] && [ ! -z "$PHORGE_STORAGE_S3_PORT" ] && [ ! -z "$PHORGE_STORAGE_S3_REGION" ]
 then
-    /var/www/phorge/phorge/bin/config set storage.s3.bucket $MINIO_SERVER
-    /var/www/phorge/phorge/bin/config set amazon-s3.secret-key $MINIO_SERVER_SECRET_KEY
-    /var/www/phorge/phorge/bin/config set amazon-s3.access-key $MINIO_SERVER_ACCESS_KEY
-    /var/www/phorge/phorge/bin/config set amazon-s3.endpoint $MINIO_SERVER:$MINIO_PORT
-    # /var/www/phorge/phorge/bin/config set amazon-s3.region us-west-1
+  /var/www/phorge/phorge/bin/config set storage.s3.bucket $PHORGE_STORAGE_S3_SERVER
+  /var/www/phorge/phorge/bin/config set amazon-s3.secret-key $PHORGE_STORAGE_S3_SERVER_SECRET_KEY
+  /var/www/phorge/phorge/bin/config set amazon-s3.access-key $PHORGE_STORAGE_S3_SERVER_ACCESS_KEY
+  /var/www/phorge/phorge/bin/config set amazon-s3.endpoint $PHORGE_STORAGE_S3_SERVER:$PHORGE_STORAGE_S3_PORT
+  /var/www/phorge/phorge/bin/config set amazon-s3.region $PHORGE_STORAGE_S3_REGION
 fi
 
 if [ ! -z "$SMTP_SERVER" ] && [ ! -z "$SMTP_PORT" ] && [ ! -z "$SMTP_USER" ] && [ ! -z "$SMTP_PASSWORD" ] &&  [ ! -z "$SMTP_PROTOCOL" ]

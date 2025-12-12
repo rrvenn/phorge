@@ -39,6 +39,9 @@ services:
     volumes: 
       - storage-server:/data
     env_file: .env
+    environment:
+      MINIO_ROOT_USER: ${PHORGE_STORAGE_S3_SERVER_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${PHORGE_STORAGE_S3_SERVER_SECRET_KEY}
 
 configs:
   my_conf:
