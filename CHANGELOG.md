@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Changed the environment variables for S3 Storage configuration
+- Changed the environmtne variables for SMTP configuration
 
 ## [0.3.1] - 2025-12-11
 ### Changed

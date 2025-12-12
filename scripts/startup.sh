@@ -64,18 +64,18 @@ then
   /var/www/phorge/phorge/bin/config set amazon-s3.region $PHORGE_STORAGE_S3_REGION
 fi
 
-if [ ! -z "$SMTP_SERVER" ] && [ ! -z "$SMTP_PORT" ] && [ ! -z "$SMTP_USER" ] && [ ! -z "$SMTP_PASSWORD" ] &&  [ ! -z "$SMTP_PROTOCOL" ]
+if [ ! -z "$PHORGE_SMTP_SERVER" ] && [ ! -z "$PHORGE_SMTP_PORT" ] && [ ! -z "$PHORGE_SMTP_USER" ] && [ ! -z "$PHORGE_SMTP_PASSWORD" ] &&  [ ! -z "$PHORGE_SMTP_PROTOCOL" ]
 then
     echo "[
   {
     \"key\": \"smtp-mailer\",
     \"type\": \"smtp\",
     \"options\": {
-      \"host\": \"$SMTP_SERVER\",
-      \"port\": $SMTP_PORT,
-      \"user\": \"$SMTP_USER\",
-      \"password\": \"$SMTP_PASSWORD\",
-      \"protocol\": \"$SMTP_PROTOCOL\"
+      \"host\": \"$PHORGE_SMTP_SERVER\",
+      \"port\": $PHORGE_SMTP_PORT,
+      \"user\": \"$PHORGE_SMTP_USER\",
+      \"password\": \"$PHORGE_SMTP_PASSWORD\",
+      \"protocol\": \"$PHORGE_SMTP_PROTOCOL\"
     }
   }
 ]" > mailers.json
