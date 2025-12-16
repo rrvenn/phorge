@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-12-16
+### Added
+- Added postfix and a way to configure phorge to use it as its mailer
+
 ## [0.3.2] - 2025-12-12
 ### Added
 - Added the gitconfig file so the phorge version informaiton can be displayed on the http(s)://<phorgeURL>/config/ page 

@@ -64,23 +64,45 @@ then
   /var/www/phorge/phorge/bin/config set amazon-s3.region $PHORGE_STORAGE_S3_REGION
 fi
 
-if [ ! -z "$PHORGE_SMTP_SERVER" ] && [ ! -z "$PHORGE_SMTP_PORT" ] && [ ! -z "$PHORGE_SMTP_USER" ] && [ ! -z "$PHORGE_SMTP_PASSWORD" ] &&  [ ! -z "$PHORGE_SMTP_PROTOCOL" ]
+# Configure SMTP mailer postfix
+postfix set-permissions
+
+if [ "$PHORGE_MAILER" == "postfix" ]
 then
+    sed -i -E "s|^[[:space:]]*#myhostname[[:space:]]*=[[:space:]]*host\.domain\.tld[[:space:]]*$|myhostname = ${PHORGE_BASE_URI}|" /etc/postfix/main.cf
+    sed -i -E '/^\[program:postfix\]/,/^\[/{ s/^autostart=.*/autostart=true/; s/^autorestart=.*/autorestart=true/ }' /etc/supervisord.conf
+
     echo "[
-  {
-    \"key\": \"smtp-mailer\",
-    \"type\": \"smtp\",
-    \"options\": {
-      \"host\": \"$PHORGE_SMTP_SERVER\",
-      \"port\": $PHORGE_SMTP_PORT,
-      \"user\": \"$PHORGE_SMTP_USER\",
-      \"password\": \"$PHORGE_SMTP_PASSWORD\",
-      \"protocol\": \"$PHORGE_SMTP_PROTOCOL\"
-    }
-  }
-]" > mailers.json
+      {
+        \"key\": \"sendmail\",
+        \"type\": \"sendmail\"
+      }
+    ]" > mailers.json
+
     /var/www/phorge/phorge/bin/config set cluster.mailers --stdin < mailers.json
     rm mailers.json
+fi
+
+if [ "$PHORGE_MAILER" == "smtp" ]
+then
+  if [ ! -z "$PHORGE_SMTP_SERVER" ] && [ ! -z "$PHORGE_SMTP_PORT" ] && [ ! -z "$PHORGE_SMTP_USER" ] && [ ! -z "$PHORGE_SMTP_PASSWORD" ] &&  [ ! -z "$PHORGE_SMTP_PROTOCOL" ]
+  then
+      echo "[
+    {
+      \"key\": \"smtp-mailer\",
+      \"type\": \"smtp\",
+      \"options\": {
+        \"host\": \"$PHORGE_SMTP_SERVER\",
+        \"port\": $PHORGE_SMTP_PORT,
+        \"user\": \"$PHORGE_SMTP_USER\",
+        \"password\": \"$PHORGE_SMTP_PASSWORD\",
+        \"protocol\": \"$PHORGE_SMTP_PROTOCOL\"
+      }
+    }
+  ]" > mailers.json
+      /var/www/phorge/phorge/bin/config set cluster.mailers --stdin < mailers.json
+      rm mailers.json
+  fi
 fi
 
 # Update base uri
